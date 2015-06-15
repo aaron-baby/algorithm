@@ -53,9 +53,13 @@ function match(array $a, $max){
 			$pack[] = get_company($item, $low, $max);
 		}
 	}
+	// var_dump($low);exit;
 	// 低维数组如果还有值
+	while (count($low)>=2) {
+		$pack[] = get_company([array_shift($low), array_shift($low)], $low, $max);
+	}
 	if ($low) {
-		$pack[] = get_company(array_shift($low), $low, $max);
+		$pack[] = $low;
 	}
 	return $pack;
 }
@@ -66,17 +70,24 @@ function match(array $a, $max){
  * 如果池子空了，直接返回最大值
  */
 function get_company($big, array &$pool, $max){
-	$result = array($big);
+	if ( is_numeric($big) ) {
+		// echo $big . "\n";
+		$result = array($big);
+		$addition = $big;
+	} else {
+		$result = $big;
+		$addition = $big[0] + $big[1];
+	}
 	if ( empty($pool) ) {
 		return $result;
 	}
 	foreach ($pool as $k=>$value) {
-		$sum = $big+$value;
+		$sum = $addition+$value;
 		// 如果和超过了最大值
 		if ($sum>$max){
 			continue;
 		}
-		$big = $sum;
+		$addition = $sum;
 		// 放入袋子，并从池子里移出
 		unset($pool[$k]);
 		$result[] = $value;
